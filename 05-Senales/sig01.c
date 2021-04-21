@@ -17,3 +17,8 @@ int main ()
    
    exit(5);
 }
+
+/*Cuando compilamos y corremos sig01.c vemos que el exit status al terminar de correr el programa es 127
+From gnu.org:
+	If a command is not found, the child process created to execute it returns a status of 127. If a command is found but is not executable, the return status is 126. 
+*/
