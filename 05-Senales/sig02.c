@@ -1,5 +1,5 @@
 /*
- * Ejercicio 1 y 2 de TP Señales
+ * Ejercicio 2 de TP Señales
 */
 
 #include <stdio.h>

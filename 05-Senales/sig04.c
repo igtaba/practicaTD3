@@ -17,8 +17,8 @@ void manejador_senial(int a){
 int main ()
 {
 
-   signal(SIGKILL, SIG_IGN);
-   //signal(SIGTSTP, SIG_IGN);  //Ctrl + z
+   //signal(SIGKILL, SIG_IGN);
+   signal(SIGTSTP, SIG_IGN);  //Ctrl + z
    
    printf("Proceso PID = %d\n", getpid());   
    
@@ -28,6 +28,10 @@ int main ()
 }
 
 /*
-	 Lo que sucede al tener el programa corriendo y ejecutar desde otra consola kill -SIGKILL PID es que el proceso es terminado desde la otra terminal por dicho comando. El exit(status) que devuelve luego de dicha señal de interrupcion es 137
-	 Esto nos demuestra que la señal SIGKILL (or SIGSTOP) cannot be ignored!
+	 Por un lado podemos ver en este caso que al ejecutar ctrl+C y ctrl+Z para terminar el proceso que ejecuta ./sig04, tenemos distintos codigos de exit(status):
+			 Ctrl+C -> Exit(Status)=130
+			 Ctrl+Z -> Exit(Status)=148
+	 Esto se debe a que ctrl+Z no envia una señal para matar el proceso, como ctrl+C que envia un SIGINT, sino que envia una SIGTSTP ($ kill -TSTP $PID_OF_PROCESS) , que en vez de interrumpir el programa, lo suspende, y luego se puede a travez del command: $ kill -CONT $PID_OF_PROCESS
+	 
+	 Por otro lado, vemos que la señal SIGTSTP por otro lado puede ser ignorada mediante el manejamiento de señal, mientras que el caso donde la señal que queremos ignorar es SIGKILL no podemos.
 */
