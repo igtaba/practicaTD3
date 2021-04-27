@@ -1,0 +1,2 @@
+El comando head nos selecciona los 3 primeros valores de los resultados que pasamos desde ls por medio de la tuberia | en sentido principio a fin. Mientras que le comando tail nos filtra (a uno) esta vez los que nos queda, desde fin a principio. > nos redirecciona la salida del ultimo comando a un archivo.
+El comando cat nos muestra por pantalla el contenido de archivo generado previamente

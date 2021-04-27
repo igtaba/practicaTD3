@@ -9,62 +9,68 @@
 #include <stdlib.h>
 #include<sys/wait.h> 
 
-#define FRASE_A "INFORMACION IMPORTANTE"
-#define FRASE_B "INFORMACION IMPORTANTE"
+#define FRASE_A "AINFORMACION IMPORTANTE"
+#define FRASE_B "BINFORMACION IMPORTANTE"
 #define BUFF_SIZE 80
 
-void pipe_sign_handler(int a){
-   
-   write (STDOUT_FILENO, "\n Problema con pipeline.\n ", sizeof("\n Problema con pipeline.\n"));
+void pipe_sign_handler(int a)			// Handler declaration
+{
+	write (STDOUT_FILENO, "\n Problema con pipeline.\n ", sizeof("\n Problema con pipeline.\n"));
 }
 
-int main (){
+int main ()
+{
+	int ipc[2], proc;
+	int leido, success;
+	char buff[BUFF_SIZE] = {0};
 
-   int ipc[2], proc;
-   int leido, success;
-   char buff[BUFF_SIZE] = {0};
+	signal(SIGPIPE, pipe_sign_handler);	// Handler call
+	   					
+	pipe(ipc);				// Pipe creation
 
-   signal(SIGPIPE, pipe_sign_handler);
-   
-   pipe(ipc);
+	switch (fork())			// Process creation and switch #1
+	{
 
-   switch (fork()){ 
+		case 0:			// What the Son #1 is going to execute
+		close(ipc[0]);			// Closes the lecture side
+		strncpy(buff, FRASE_A, sizeof(FRASE_A));	// Copies the string A
+		write(ipc[1], buff, sizeof(FRASE_A));		// Writes the string A in the pipe
+		exit(0);
+		break;
       
-      case 0:
-      close(ipc[0]);      
-      strncpy(buff, FRASE_A, sizeof(FRASE_A)); 
-      write(ipc[1], buff, sizeof(FRASE_A));
-      exit(0);
-      break;
-      
-      default:
-      switch (fork()){ 
-            
-         case 0:
-            close(ipc[0]);               
-            strncpy(buff, FRASE_B, sizeof(FRASE_B)); 
-            write(ipc[1], buff,    sizeof(FRASE_B));
-            exit(0);      
-         break;
-         default:
-            close(ipc[1]);
-            int i;
-            for(i=0; i<2; i++){
-               leido = read(ipc[0], buff, sizeof(buff));
-               if(leido < 1){
-                  write (STDOUT_FILENO, "\nError al leer tuberia", sizeof("\nError al leer tuberia"));
-               }else {
-                  write (STDOUT_FILENO, "Leido de la tuberia ", sizeof("\nLeido de la tuberia"));
-                  write (STDOUT_FILENO, buff, leido-1);
-                  printf(", por el proceso padre, pid %d \n", getpid());
-               }
-            }
+		default:			// What the father is going to run
+		switch (fork())		// Process creation and switch #2
+		{ 
+			case 0:		// What the Son #2 is going to execute
+			close(ipc[0]);		// Closes the lecture side
+			strncpy(buff, FRASE_B, sizeof(FRASE_B));	// Copies the string B
+			write(ipc[1], buff,    sizeof(FRASE_B));	// Writes the string A in the pipe
+			exit(0);      
+        		break;
+			
+			default:		// What the father is going to run
+			close(ipc[1]);		// Closes the writing side
+			int i;
+			for(i=0; i<2; i++)
+			{
+				leido = read(ipc[0], buff, sizeof(buff));	//Reads from the pipe and puts it in the buff
+				if(leido < 1)
+				{
+				write (STDOUT_FILENO, "\nError al leer tuberia", sizeof("\nError al leer tuberia"));
+				}
+				else 
+				{
+				write (STDOUT_FILENO, "Leido de la tuberia ", sizeof("\nLeido de la tuberia"));
+				write (STDOUT_FILENO, buff, leido-1);
+				printf(", por el proceso padre, pid %d \n", getpid());
+               		}
+            		}
 
-            close(ipc[0]);
-            wait(NULL);
-            wait(NULL);
-            exit(0);
-         break;
-      }
-   }   
+		close(ipc[0]);
+		wait(NULL);
+		wait(NULL);
+		exit(0);
+		break;
+ 		}
+	}   
 }

@@ -41,7 +41,7 @@ int main (){
 		{
 			write (STDOUT_FILENO, "\nError al leer tuberia", sizeof("\nError al leer tuberia"));
 	 	}
-		else 
+		else		// The content of the buff is put out through the stdout (terminal screen)
 		{
 			write (STDOUT_FILENO, "Leido de la tuberia ", sizeof("\nLeido de la tuberia"));
 			write (STDOUT_FILENO, buff, leido-1);
